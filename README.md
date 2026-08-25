@@ -1,4 +1,3 @@
-```markdown
 # COBOL Stub Generator
 
 ## Overview
