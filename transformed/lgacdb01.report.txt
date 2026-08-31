@@ -1,0 +1,38 @@
+==============================================================================
+COBOL transformation report - LGACDB01
+==============================================================================
+source            : C:\Users\dhruv\Desktop\IIT-Kanpur\IBM\cobol-ast-generator-java-cli\cobol-ast-generator-java-cli\genapp-files\src\lgacdb01.cbl
+output            : C:\Users\dhruv\Desktop\IIT-Kanpur\IBM\cobol-ast-generator-java-cli\cobol-ast-generator-java-cli\transformed\lgacdb01.cbl
+detection backend : ast
+linkage promoted  : True
+synthesized EIB   : EIBTRNID, EIBTASKN, EIBTRMID, EIBCALEN
+copybooks:
+    LGCMAREA x1
+    LGPOLICY x1
+    SQLCA x1 (generated)
+
+constructs        : 17
+by status         : {'commented_and_mocked': 16, 'substituted_in_place': 1}
+fallback rule use : 0
+skipped           : 0
+
+------------------------------------------------------------------------------
+  LINE  CAT    VERB             RULE                   P  STATUS
+------------------------------------------------------------------------------
+   389  cics   ABEND            cics_abend             n  commented_and_mocked
+   404  cics   RETURN           cics_return            n  commented_and_mocked
+   411  cics   LINK             cics_link              Y  commented_and_mocked
+   423  cics   LINK             cics_link              Y  commented_and_mocked
+   429  cics   RETURN           cics_return            Y  commented_and_mocked
+   438  cics   GET COUNTER      cics_counter           Y  commented_and_mocked
+   443  dfhresp                  cics_dfhresp           n  substituted_in_place
+   459  sql    INSERT           sql_update             n  commented_and_mocked
+   485  cics   RETURN           cics_return            n  commented_and_mocked
+   488  sql    INSERT           sql_update             n  commented_and_mocked
+   514  cics   RETURN           cics_return            n  commented_and_mocked
+   517  sql    SET              sql_set                n  commented_and_mocked
+   536  cics   ASKTIME          cics_time              n  commented_and_mocked
+   538  cics   FORMATTIME       cics_time              n  commented_and_mocked
+   545  cics   LINK             cics_link              Y  commented_and_mocked
+   553  cics   LINK             cics_link              n  commented_and_mocked
+   559  cics   LINK             cics_link              n  commented_and_mocked

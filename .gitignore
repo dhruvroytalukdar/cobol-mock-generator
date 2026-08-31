@@ -1,0 +1,22 @@
+# AST generator (external/local dependency — treated like an environment
+# variable: required to run the pipeline, never committed to the repo)
+/target/
+/ast/
+/cobol-ast-cli.sh
+/cobol-ast-cli.bat
+/cobol-ast-server.sh
+/cobol-ast-server.bat
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS junk
+.DS_Store
+
+# Compiled GnuCOBOL binaries (regenerable from the committed .cbl via `cobc`)
+transformed/*
+!transformed/*.cbl
+!transformed/*.json
+!transformed/*.txt

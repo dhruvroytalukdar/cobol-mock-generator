@@ -1,0 +1,40 @@
+==============================================================================
+COBOL transformation report - LGTESTP4
+==============================================================================
+source            : C:\Users\dhruv\Desktop\IIT-Kanpur\IBM\cobol-ast-generator-java-cli\cobol-ast-generator-java-cli\genapp-files\src\lgtestp4.cbl
+output            : C:\Users\dhruv\Desktop\IIT-Kanpur\IBM\cobol-ast-generator-java-cli\cobol-ast-generator-java-cli\transformed\lgtestp4.cbl
+detection backend : ast
+linkage promoted  : False
+synthesized EIB   : EIBCALEN
+copybooks:
+    LGCMAREA x1
+    SSMAP x1 (generated)
+
+constructs        : 20
+by status         : {'commented_and_mocked': 20}
+fallback rule use : 0
+skipped           : 0
+
+------------------------------------------------------------------------------
+  LINE  CAT    VERB             RULE                   P  STATUS
+------------------------------------------------------------------------------
+   773  cics   SEND MAP         cics_terminal          Y  commented_and_mocked
+   780  cics   HANDLE AID       cics_noop              Y  commented_and_mocked
+   783  cics   HANDLE CONDITION cics_noop              Y  commented_and_mocked
+   787  cics   RECEIVE MAP      cics_terminal          Y  commented_and_mocked
+   843  cics   LINK             cics_link              n  commented_and_mocked
+   871  cics   SEND MAP         cics_terminal          n  commented_and_mocked
+   899  cics   LINK             cics_link              n  commented_and_mocked
+   904  cics   SYNCPOINT        cics_noop              n  commented_and_mocked
+   912  cics   SEND MAP         cics_terminal          n  commented_and_mocked
+   922  cics   LINK             cics_link              n  commented_and_mocked
+   927  cics   SYNCPOINT        cics_noop              n  commented_and_mocked
+   951  cics   SEND MAP         cics_terminal          n  commented_and_mocked
+   963  cics   SEND MAP         cics_terminal          n  commented_and_mocked
+   975  cics   RETURN           cics_return            Y  commented_and_mocked
+   979  cics   RETURN           cics_return            Y  commented_and_mocked
+   985  cics   SEND TEXT        cics_terminal          n  commented_and_mocked
+   991  cics   RETURN           cics_return            Y  commented_and_mocked
+   997  cics   SEND MAP         cics_terminal          n  commented_and_mocked
+  1002  cics   RETURN           cics_return            Y  commented_and_mocked
+  1030  cics   SEND MAP         cics_terminal          Y  commented_and_mocked

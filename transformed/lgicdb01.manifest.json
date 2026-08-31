@@ -1,0 +1,282 @@
+{
+  "program": "LGICDB01",
+  "source_path": "C:\\Users\\dhruv\\Desktop\\IIT-Kanpur\\IBM\\cobol-ast-generator-java-cli\\cobol-ast-generator-java-cli\\genapp-files\\src\\lgicdb01.cbl",
+  "output_path": "C:\\Users\\dhruv\\Desktop\\IIT-Kanpur\\IBM\\cobol-ast-generator-java-cli\\cobol-ast-generator-java-cli\\transformed\\lgicdb01.cbl",
+  "detection_backend": "ast",
+  "ast_error": null,
+  "copybooks": {
+    "LGPOLICY": {
+      "occurrences": 1,
+      "path": "C:\\Users\\dhruv\\Desktop\\IIT-Kanpur\\IBM\\cobol-ast-generator-java-cli\\cobol-ast-generator-java-cli\\genapp-files\\src\\LGPOLICY.cpy",
+      "synthesized": false
+    },
+    "SQLCA": {
+      "occurrences": 1,
+      "path": "<builtin:SQLCA>",
+      "synthesized": true
+    },
+    "LGCMAREA": {
+      "occurrences": 1,
+      "path": "C:\\Users\\dhruv\\Desktop\\IIT-Kanpur\\IBM\\cobol-ast-generator-java-cli\\cobol-ast-generator-java-cli\\genapp-files\\src\\LGCMAREA.cpy",
+      "synthesized": false
+    }
+  },
+  "synthesized_fields": [
+    "EIBTRNID",
+    "EIBTASKN",
+    "EIBTRMID",
+    "EIBCALEN"
+  ],
+  "linkage_promoted": true,
+  "constructs": [
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 122,
+      "expanded_line_start": 359,
+      "expanded_line_end": 359,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "ABEND",
+      "raw_text": "EXEC CICS ABEND ABCODE('LGCA') NODUMP END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_abend",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 366,
+      "commented_line_end": 366,
+      "inserted_line_start": 367,
+      "inserted_line_end": 368,
+      "generated_text": [
+        "               DISPLAY '>>> MOCK ABEND @MAINLINE: ' 'ABCODE=LGCA'",
+        "               GOBACK"
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 142,
+      "expanded_line_start": 379,
+      "expanded_line_end": 379,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "RETURN",
+      "raw_text": "EXEC CICS RETURN END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_return",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 388,
+      "commented_line_end": 388,
+      "inserted_line_start": 389,
+      "inserted_line_end": 390,
+      "generated_text": [
+        "             DISPLAY '>>> MOCK RETURN @MAINLINE'",
+        "             GOBACK"
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 161,
+      "expanded_line_start": 398,
+      "expanded_line_end": 398,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "RETURN",
+      "raw_text": "EXEC CICS RETURN END-EXEC",
+      "had_trailing_period": true,
+      "matched_rule": "cics_return",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 409,
+      "commented_line_end": 409,
+      "inserted_line_start": 410,
+      "inserted_line_end": 411,
+      "generated_text": [
+        "           DISPLAY '>>> MOCK RETURN @MAINLINE-END'",
+        "           GOBACK."
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 169,
+      "expanded_line_start": 406,
+      "expanded_line_end": 427,
+      "node_type": "ExecEndExec",
+      "category": "sql",
+      "verb": "SELECT",
+      "raw_text": "EXEC SQL SELECT FIRSTNAME, LASTNAME, DATEOFBIRTH, HOUSENAME, HOUSENUMBER, POSTCODE, PHONEMOBILE, PHONEHOME, EMAILADDRESS INTO :CA-FIRST-NAME, :CA-LAST-NAME, :CA-DOB, :CA-HOUSE-NAME, :CA-HOUSE-NUM, :CA",
+      "had_trailing_period": true,
+      "matched_rule": "sql_select",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 419,
+      "commented_line_end": 440,
+      "inserted_line_start": 441,
+      "inserted_line_end": 452,
+      "generated_text": [
+        "           DISPLAY '>>> MOCK SELECT @GET-CUSTOMER-INFO: '",
+        "               'TABLE=CUSTOMER'",
+        "           MOVE 'DUMMY' TO CA-FIRST-NAME",
+        "           MOVE 'DUMMY' TO CA-LAST-NAME",
+        "           MOVE '2024-01-01' TO CA-DOB",
+        "           MOVE 'DUMMY' TO CA-HOUSE-NAME",
+        "           MOVE 'DUMM' TO CA-HOUSE-NUM",
+        "           MOVE 'DUMMY' TO CA-POSTCODE",
+        "           MOVE 'DUMMY' TO CA-PHONE-MOBILE",
+        "           MOVE 'DUMMY' TO CA-PHONE-HOME",
+        "           MOVE 'DUMMY' TO CA-EMAIL-ADDRESS",
+        "           MOVE 0 TO SQLCODE."
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 202,
+      "expanded_line_start": 439,
+      "expanded_line_end": 439,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "RETURN",
+      "raw_text": "EXEC CICS RETURN END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_return",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 464,
+      "commented_line_end": 464,
+      "inserted_line_start": 465,
+      "inserted_line_end": 466,
+      "generated_text": [
+        "               DISPLAY '>>> MOCK RETURN @GET-CUSTOMER-INFO'",
+        "               GOBACK"
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 216,
+      "expanded_line_start": 453,
+      "expanded_line_end": 454,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "ASKTIME",
+      "raw_text": "EXEC CICS ASKTIME ABSTIME(WS-ABSTIME) END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_time",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 480,
+      "commented_line_end": 481,
+      "inserted_line_start": 482,
+      "inserted_line_end": 483,
+      "generated_text": [
+        "           DISPLAY '>>> MOCK ASKTIME @WRITE-ERROR-MESSAGE'",
+        "           MOVE 0 TO WS-ABSTIME"
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 218,
+      "expanded_line_start": 455,
+      "expanded_line_end": 458,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "FORMATTIME",
+      "raw_text": "EXEC CICS FORMATTIME ABSTIME(WS-ABSTIME) MMDDYYYY(WS-DATE) TIME(WS-TIME) END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_time",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 484,
+      "commented_line_end": 487,
+      "inserted_line_start": 488,
+      "inserted_line_end": 491,
+      "generated_text": [
+        "           DISPLAY '>>> MOCK FORMATTIME @WRITE-ERROR-MESSAGE'",
+        "           MOVE 0 TO WS-ABSTIME",
+        "           MOVE '01012024' TO WS-DATE",
+        "           MOVE '120000' TO WS-TIME"
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 225,
+      "expanded_line_start": 462,
+      "expanded_line_end": 465,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "LINK",
+      "raw_text": "EXEC CICS LINK PROGRAM('LGSTSQ') COMMAREA(ERROR-MSG) LENGTH(LENGTH OF ERROR-MSG) END-EXEC",
+      "had_trailing_period": true,
+      "matched_rule": "cics_link",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 495,
+      "commented_line_end": 498,
+      "inserted_line_start": 499,
+      "inserted_line_end": 499,
+      "generated_text": [
+        "           DISPLAY '>>> MOCK LINK @WRITE-ERROR-MESSAGE: ' 'LGSTSQ'."
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 233,
+      "expanded_line_start": 470,
+      "expanded_line_end": 473,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "LINK",
+      "raw_text": "EXEC CICS LINK PROGRAM('LGSTSQ') COMMAREA(CA-ERROR-MSG) LENGTH(LENGTH OF CA-ERROR-MSG) END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_link",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 504,
+      "commented_line_end": 507,
+      "inserted_line_start": 508,
+      "inserted_line_end": 508,
+      "generated_text": [
+        "               DISPLAY '>>> MOCK LINK @WRITE-ERROR-MESSAGE: ' 'LGSTSQ'"
+      ],
+      "diagnostic_codes": []
+    },
+    {
+      "original_file": "lgicdb01.cbl",
+      "original_line": 239,
+      "expanded_line_start": 476,
+      "expanded_line_end": 479,
+      "node_type": "ExecEndExec",
+      "category": "cics",
+      "verb": "LINK",
+      "raw_text": "EXEC CICS LINK PROGRAM('LGSTSQ') COMMAREA(CA-ERROR-MSG) LENGTH(LENGTH OF CA-ERROR-MSG) END-EXEC",
+      "had_trailing_period": false,
+      "matched_rule": "cics_link",
+      "confidence": "high",
+      "status": "commented_and_mocked",
+      "commented_line_start": 511,
+      "commented_line_end": 514,
+      "inserted_line_start": 515,
+      "inserted_line_end": 515,
+      "generated_text": [
+        "               DISPLAY '>>> MOCK LINK @WRITE-ERROR-MESSAGE: ' 'LGSTSQ'"
+      ],
+      "diagnostic_codes": []
+    }
+  ],
+  "diagnostics": [],
+  "compile_result": null,
+  "summary": {
+    "constructs": 10,
+    "by_status": {
+      "commented_and_mocked": 10
+    },
+    "fallback_rules_used": 0,
+    "skipped": 0
+  }
+}

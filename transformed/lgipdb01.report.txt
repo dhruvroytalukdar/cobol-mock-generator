@@ -1,0 +1,46 @@
+==============================================================================
+COBOL transformation report - LGIPDB01
+==============================================================================
+source            : C:\Users\dhruv\Desktop\IIT-Kanpur\IBM\cobol-ast-generator-java-cli\cobol-ast-generator-java-cli\genapp-files\src\lgipdb01.cbl
+output            : C:\Users\dhruv\Desktop\IIT-Kanpur\IBM\cobol-ast-generator-java-cli\cobol-ast-generator-java-cli\transformed\lgipdb01.cbl
+detection backend : ast
+linkage promoted  : True
+synthesized EIB   : EIBTRNID, EIBTASKN, EIBTRMID, EIBCALEN, MOCK-FETCH-CNT-16, MOCK-FETCH-CNT-19
+copybooks:
+    LGCMAREA x1
+    LGPOLICY x1
+    SQLCA x1 (generated)
+
+constructs        : 25
+by status         : {'commented_only': 2, 'commented_and_mocked': 23}
+fallback rule use : 0
+skipped           : 0
+
+------------------------------------------------------------------------------
+  LINE  CAT    VERB             RULE                   P  STATUS
+------------------------------------------------------------------------------
+    89  sql    DECLARE CURSOR   sql_declarative        Y  commented_only
+   120  sql    DECLARE CURSOR   sql_declarative        Y  commented_only
+   489  cics   ABEND            cics_abend             n  commented_and_mocked
+   548  cics   RETURN           cics_return            Y  commented_and_mocked
+   565  sql    SELECT           sql_select             n  commented_and_mocked
+   627  cics   RETURN           cics_return            n  commented_and_mocked
+   679  sql    SELECT           sql_select             n  commented_and_mocked
+   724  cics   RETURN           cics_return            n  commented_and_mocked
+   767  sql    SELECT           sql_select             n  commented_and_mocked
+   818  cics   RETURN           cics_return            n  commented_and_mocked
+   866  sql    SELECT           sql_select             n  commented_and_mocked
+   926  cics   RETURN           cics_return            n  commented_and_mocked
+   969  sql    SELECT           sql_select             n  commented_and_mocked
+  1030  cics   RETURN           cics_return            n  commented_and_mocked
+  1075  sql    OPEN             sql_cursor_lifecycle   Y  commented_and_mocked
+  1087  sql    CLOSE            sql_cursor_lifecycle   Y  commented_and_mocked
+  1100  sql    FETCH            sql_fetch              n  commented_and_mocked
+  1158  sql    OPEN             sql_cursor_lifecycle   Y  commented_and_mocked
+  1170  sql    CLOSE            sql_cursor_lifecycle   Y  commented_and_mocked
+  1182  sql    FETCH            sql_fetch              n  commented_and_mocked
+  1236  cics   ASKTIME          cics_time              n  commented_and_mocked
+  1238  cics   FORMATTIME       cics_time              n  commented_and_mocked
+  1245  cics   LINK             cics_link              Y  commented_and_mocked
+  1253  cics   LINK             cics_link              n  commented_and_mocked
+  1259  cics   LINK             cics_link              n  commented_and_mocked
