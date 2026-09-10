@@ -35,10 +35,14 @@ __pycache__/
 
 # Instrumented variants and their binaries (regenerable from a testN.json plus
 # the transformed source, exactly as transformed/ is regenerable from src)
-instrumented/**
-!instrumented/**/
-!instrumented/**/*.cbl
-!instrumented/**/*.json
+/instrumented/
 
-# Generated test-generation prompts (rebuilt from the program + variable table)
-testsuites/**/prompt.txt
+# Generated/experiment-run data, not source: test suites, stage-4 coverage
+# reports, and hand-authored mutants + their harness runs. Same treatment as
+# transformed/ and judge_results/ above.
+/testsuites/
+/reports/
+/experiments/
+
+# Raw third-party COBOL corpus used as pipeline input, not project source.
+/aws-carddemo-files/
