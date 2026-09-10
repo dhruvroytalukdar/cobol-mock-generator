@@ -3,7 +3,9 @@
 Built by scanning text rather than the AST for two reasons: the same table is
 needed on the fallback path (where no AST exists), and data-description entries
 are strictly regular in fixed format, so a text scan is both simple and exact.
-The lexer mask keeps comment lines and literals out of the scan.
+Comment lines are skipped by column-7 indicator; a data entry's own terminating
+period is found by a quote-aware scan so a VALUE literal containing a period
+(e.g. ``VALUE 'END OF FILE.'``) is never mistaken for the entry terminator.
 
 Recorded per item: level, name, PICTURE, USAGE, REDEFINES, OCCURS, VALUE, the
 owning section, and parent/child links reconstructed from level numbers.
@@ -40,6 +42,40 @@ _USAGE = re.compile(
     re.IGNORECASE,
 )
 _VALUE = re.compile(r"\bVALUE\s+(?:IS\s+)?(?P<v>'[^']*'|\"[^\"]*\"|[^\s.]+)", re.IGNORECASE)
+
+
+def _find_entry_terminator(s: str) -> int:
+    """Index of the first period outside a quoted literal, or -1 if none.
+
+    A period inside a ``VALUE`` literal (``VALUE 'END OF FILE.'``) is part of
+    the literal's content, not the entry terminator -- splitting on it
+    unconditionally would truncate the literal and desynchronize the rest of
+    the entry's clauses.
+    """
+    in_string = False
+    quote = ""
+    i = 0
+    n = len(s)
+    while i < n:
+        ch = s[i]
+        if in_string:
+            if ch == quote:
+                if i + 1 < n and s[i + 1] == quote:
+                    i += 2
+                    continue
+                in_string = False
+                quote = ""
+            i += 1
+            continue
+        if ch in ("'", '"'):
+            in_string = True
+            quote = ch
+            i += 1
+            continue
+        if ch == ".":
+            return i
+        i += 1
+    return -1
 
 
 @dataclass
@@ -115,10 +151,48 @@ class SymbolTable:
             out.extend(self.elementary_fields(child_name, _depth + 1))
         return out
 
+    def occurs_chain(self, name: str) -> List[Symbol]:
+        """Every ``OCCURS``-bearing item in ``name``'s own-or-ancestor chain.
+
+        Outermost first.  Covers both an item that repeats itself (``OCCURS``
+        on an elementary field) and one nested under a repeating group -- both
+        need a subscript to be referenced validly, and a field can need more
+        than one when OCCURS tables are nested inside each other.
+        """
+        sym = self.get(name)
+        if sym is None:
+            return []
+        chain: List[Symbol] = []
+        node: Optional[Symbol] = sym
+        depth = 0
+        while node is not None and depth < 20:
+            if node.occurs > 0:
+                chain.append(node)
+            node = self.get(node.parent) if node.parent else None
+            depth += 1
+        chain.reverse()
+        return chain
+
+    def subscript_for(self, name: str, index: int = 1) -> str:
+        """The ``(i, i, ...)`` text ``name`` needs to be referenced validly.
+
+        Empty string when ``name`` needs no subscript.  ``index`` is reused for
+        every level -- a mock only needs to populate one deterministic element,
+        not walk the whole table.
+        """
+        depth = len(self.occurs_chain(name))
+        if depth == 0:
+            return ""
+        return "(" + ", ".join([str(index)] * depth) + ")"
+
 
 def build_symbol_table(text: str, lexer: Optional[SourceLexer] = None) -> SymbolTable:
-    """Scan the DATA DIVISION of ``text`` into a :class:`SymbolTable`."""
-    lx = lexer or SourceLexer(text)
+    """Scan the DATA DIVISION of ``text`` into a :class:`SymbolTable`.
+
+    ``lexer`` is accepted (and reused by the caller elsewhere) but not needed
+    here: comment lines are filtered directly by column-7 indicator, and the
+    quote-aware entry-terminator scan below does its own literal masking.
+    """
     index = LineIndex(text)
     table = SymbolTable()
 
@@ -159,12 +233,15 @@ def build_symbol_table(text: str, lexer: Optional[SourceLexer] = None) -> Symbol
         if not pending:
             pending_offset = ls + AREA_A_START
         pending += (" " if pending else "") + code.strip()
-        if "." not in pending:
+        if _find_entry_terminator(pending) == -1:
             continue  # entry continues on the next line
 
         # One or more complete entries may be present; process each.
-        while "." in pending:
-            head, pending = pending.split(".", 1)
+        while True:
+            term = _find_entry_terminator(pending)
+            if term == -1:
+                break
+            head, pending = pending[:term], pending[term + 1:]
             pending = pending.strip()
             _consume_entry(head, section, stack, table, pending_offset)
         pending = ""

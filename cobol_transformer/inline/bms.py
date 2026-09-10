@@ -120,6 +120,14 @@ def parse_bms(text: str) -> tuple[List[BmsMap], bool]:
                 length = int((raw_len or "0").strip())
             except ValueError:
                 length = 0
+            if length <= 0:
+                # LENGTH= is optional: BMS derives an unspecified length from
+                # the field's own INITIAL text.  Without this fallback the
+                # field is silently dropped from the generated symbolic map,
+                # and any program referencing it by name fails to compile.
+                raw_init = _operand(ops, "INITIAL")
+                if raw_init and raw_init.startswith("'") and raw_init.endswith("'"):
+                    length = len(raw_init[1:-1])
             if length > 0:
                 current.fields.append(BmsField(name=label, length=length))
     return maps, tioapfx

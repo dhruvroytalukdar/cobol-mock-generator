@@ -39,7 +39,7 @@ def _populate_host_vars(ctx: RuleContext, names: List[str], out: List[str]) -> N
             continue
         lit = literal_for(sym, ctx.values)
         if lit is not None:
-            out.append(f"MOVE {lit} TO {sym.name}")
+            out.append(f"MOVE {lit} TO {sym.name}{ctx.symbols.subscript_for(sym.name)}")
 
 
 def _into_list(ctx: RuleContext) -> List[str]:

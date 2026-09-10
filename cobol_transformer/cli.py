@@ -34,7 +34,7 @@ def _common(parser: argparse.ArgumentParser) -> None:
         help="copybook search directory (repeatable)",
     )
     parser.add_argument(
-        "--continue-on-missing-copybook", action="store_true", default=True,
+        "--continue-on-missing-copybook", action="store_true", default=False,
         help="emit a placeholder instead of failing when a copybook is absent",
     )
     parser.add_argument("--no-ast", action="store_true",

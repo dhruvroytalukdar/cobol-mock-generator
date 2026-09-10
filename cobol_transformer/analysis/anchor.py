@@ -7,6 +7,15 @@ a monotonically advancing cursor.  Processing nodes in document order means two
 byte-identical statements (two identical ``EXEC CICS ABEND`` blocks, say) each
 match their own occurrence instead of both collapsing onto the first.
 
+The search is masked by :class:`~cobol_transformer.inline.lexer.SourceLexer`
+the same way ``inline/scanner.py`` and the text-fallback detector already are:
+a candidate match starting inside a comment or a string literal is skipped in
+favour of a later, live one, rather than accepted at face value.  Without this,
+a live statement whose text also appears verbatim as a disabled/commented
+duplicate earlier in the file (a real pattern in this corpus -- one option of a
+multi-line command the original author had commented out) would anchor onto the
+inert copy instead.
+
 Failure is always fail-closed: a node that cannot be located is skipped and
 reported, never guessed at.  An unmocked statement is a visible compile error;
 a mis-anchored splice would silently corrupt unrelated code.
@@ -19,7 +28,10 @@ from typing import List, Optional, Tuple
 
 from ..ast_client.ast_model import AstDocument, AstNode
 from ..errors import Diagnostic, Severity
+from ..inline.lexer import Kind, SourceLexer
 from .node_classifier import Category, ClassifierRule, NodeClassifier
+
+_LIVE_KINDS = (Kind.CODE, Kind.EXEC)
 
 
 @dataclass
@@ -63,13 +75,35 @@ def _flexible_pattern(needle: str) -> re.Pattern:
     return re.compile(r"\s+".join(parts))
 
 
+def _find_live(text: str, needle: str, start: int, lexer: SourceLexer) -> int:
+    """Like ``text.find``, but skips a match starting outside live code."""
+    pos = start
+    while True:
+        idx = text.find(needle, pos)
+        if idx == -1 or lexer.kind_at(idx) in _LIVE_KINDS:
+            return idx
+        pos = idx + 1  # this occurrence is inert; keep looking forward
+
+
+def _search_live(pattern: re.Pattern, text: str, start: int, lexer: SourceLexer):
+    """Like ``pattern.search``, but skips a match starting outside live code."""
+    pos = start
+    while True:
+        m = pattern.search(text, pos)
+        if m is None or lexer.kind_at(m.start()) in _LIVE_KINDS:
+            return m
+        pos = m.start() + 1
+
+
 def anchor_nodes(
     text: str,
     document: AstDocument,
     classifier: Optional[NodeClassifier] = None,
+    lexer: Optional[SourceLexer] = None,
 ) -> AnchorResult:
     """Locate every classified node of ``document`` inside ``text``."""
     cls = classifier or NodeClassifier()
+    lx = lexer or SourceLexer(text)
     result = AnchorResult()
     cursor = 0
 
@@ -81,17 +115,21 @@ def anchor_nodes(
         if not needle:
             continue
 
-        idx = text.find(needle, cursor)
+        idx = _find_live(text, needle, cursor, lx)
         matched_len = len(needle)
 
         if idx == -1:
             # Whitespace-tolerant retry before giving up.
-            m = _flexible_pattern(needle).search(text, cursor)
+            m = _search_live(_flexible_pattern(needle), text, cursor, lx)
             if m:
                 idx, matched_len = m.start(), m.end() - m.start()
 
         if idx == -1:
-            before = text.find(needle, 0, cursor)
+            # No live occurrence at or after cursor was found above, so any
+            # live occurrence found from the very start must be strictly
+            # earlier than cursor -- this stays live-aware too, so an "out of
+            # order" diagnostic is never raised over a merely-inert duplicate.
+            before = _find_live(text, needle, 0, lx)
             code = "E-ANCHOR-OUT-OF-ORDER" if before != -1 else "E-ANCHOR-NOT-FOUND"
             msg = (
                 f"{node.node_type} source text could not be located at or after "

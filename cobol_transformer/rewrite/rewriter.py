@@ -30,6 +30,7 @@ class RewriteEntry:
     generated: List[str] = field(default_factory=list)
     commented_lines: Tuple[int, int] = (0, 0)
     inserted_lines: Tuple[int, int] = (0, 0)
+    already_commented_lines: Tuple[int, ...] = ()
     rule_name: str = ""
     confidence: str = "high"
     diagnostics: List[Diagnostic] = field(default_factory=list)
@@ -147,6 +148,12 @@ def rewrite(
         # Skip the original line ending; the block already emitted one.
         cursor = block_stop + 1 if block_stop < len(text) else len(text)
 
+        already_commented_lines = tuple(
+            commented_start + 1 + offset
+            for offset, was_comment in enumerate(block.already_comment)
+            if was_comment
+        )
+
         entries.append(
             RewriteEntry(
                 range=rng,
@@ -154,6 +161,7 @@ def rewrite(
                 generated=list(mock_lines),
                 commented_lines=(commented_start + 1, commented_stop),
                 inserted_lines=(inserted_start + 1, inserted_stop),
+                already_commented_lines=already_commented_lines,
                 rule_name=rule_name,
                 confidence=confidence,
                 diagnostics=list(rule_diags),

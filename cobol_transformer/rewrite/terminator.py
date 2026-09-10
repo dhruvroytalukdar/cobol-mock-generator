@@ -11,20 +11,32 @@ from __future__ import annotations
 from typing import List
 
 from ..analysis.anchor import ReplacementRange
+from ..linetools import is_comment_line
 
 
 def scan_forward_period(text: str, end: int) -> int:
     """Offset just past a sentence-terminating period following ``end``, else ``end``.
 
-    Only whitespace may separate the statement from its period; any other token
-    means the period (if any) belongs to a later statement.  A digit after the
-    period would make it a decimal point, which cannot occur at a statement
-    boundary but is rejected explicitly as a regression guard.
+    Only whitespace and whole comment lines may separate the statement from
+    its period; any other token means the period (if any) belongs to a later
+    statement.  A digit after the period would make it a decimal point, which
+    cannot occur at a statement boundary but is rejected explicitly as a
+    regression guard.
     """
     i = end
     n = len(text)
-    while i < n and text[i] in " \t\r\n":
-        i += 1
+    while True:
+        start = i
+        while i < n and text[i] in " \t\r\n":
+            i += 1
+        line_start = text.rfind("\n", 0, i) + 1
+        line_end = text.find("\n", line_start)
+        if line_end == -1:
+            line_end = n
+        if is_comment_line(text[line_start:line_end]):
+            i = line_end + 1 if line_end < n else n
+        if i == start:
+            break
     if i < n and text[i] == ".":
         nxt = text[i + 1] if i + 1 < n else ""
         if not nxt.isdigit():

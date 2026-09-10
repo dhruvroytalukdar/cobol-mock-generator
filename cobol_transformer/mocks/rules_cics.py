@@ -126,7 +126,7 @@ def populate(ctx: RuleContext, target: Optional[str], out: List[str]) -> bool:
         lit = literal_for(sym, ctx.values)
         if lit is None:
             return False
-        out.append(f"MOVE {lit} TO {sym.name}")
+        out.append(f"MOVE {lit} TO {sym.name}{ctx.symbols.subscript_for(sym.name)}")
         return True
 
     wrote = False
@@ -134,12 +134,12 @@ def populate(ctx: RuleContext, target: Optional[str], out: List[str]) -> bool:
         lit = literal_for(leaf, ctx.values)
         if lit is None or leaf.is_filler:
             continue
-        out.append(f"MOVE {lit} TO {leaf.name}")
+        out.append(f"MOVE {lit} TO {leaf.name}{ctx.symbols.subscript_for(leaf.name)}")
         wrote = True
     if not wrote:
         # A group with no usable leaves is still cleared, so the caller sees a
         # defined buffer rather than whatever was there before.
-        out.append(f"MOVE SPACES TO {sym.name}")
+        out.append(f"MOVE SPACES TO {sym.name}{ctx.symbols.subscript_for(sym.name)}")
         wrote = True
     return wrote
 

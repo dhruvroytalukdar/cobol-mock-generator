@@ -23,7 +23,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Sequence
+from typing import Callable, Dict, List, Optional, Sequence, Tuple
 
 from ..errors import CopybookNotFoundError
 from ..inline.bms import generate_symbolic_map
@@ -87,7 +87,7 @@ class CopybookResolver:
                 dirs.append(src)
         self.search_dirs = dirs
         self.enable_builtins = enable_builtins
-        self._cache: Dict[str, ResolvedCopybook] = {}
+        self._cache: Dict[Tuple[str, str], ResolvedCopybook] = {}
         self._builtins: Dict[str, Callable[[], ResolvedCopybook]] = {
             "SQLCA": self._builtin_sqlca,
             "SSMAP": self._builtin_ssmap,
@@ -151,8 +151,12 @@ class CopybookResolver:
         subdirectory hint; no corpus example exercises it.
         """
         key = name.upper()
-        if key in self._cache:
-            return self._cache[key]
+        # The cache key must include the library qualifier: two members named
+        # alike in different libraries (COPY X OF LIBA. / COPY X OF LIBB.)
+        # are different copybooks and must not collide on a shared cache slot.
+        cache_key = (key, library.upper() if library else "")
+        if cache_key in self._cache:
+            return self._cache[cache_key]
 
         # A real file always wins over a built-in provider.
         path: Optional[str] = None
@@ -176,6 +180,6 @@ class CopybookResolver:
                 f"copybook {name!r} not found on search path: {self.search_dirs}"
             )
 
-        self._cache[key] = rc
+        self._cache[cache_key] = rc
         self.resolved[key] = rc
         return rc

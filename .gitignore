@@ -7,6 +7,13 @@
 /cobol-ast-server.sh
 /cobol-ast-server.bat
 
+# Scratch workspace for dummy/temporary files created during a session
+/scratch/
+
+# AST server log files (produced when starting it via a redirected process)
+/ast-server.log
+/ast-server.err.log
+
 # Python
 __pycache__/
 *.pyc
@@ -16,7 +23,19 @@ __pycache__/
 .DS_Store
 
 # Compiled GnuCOBOL binaries (regenerable from the committed .cbl via `cobc`)
-transformed/*
-!transformed/*.cbl
-!transformed/*.json
-!transformed/*.txt
+# transformed/{aws,genapp}/ hold the AWS CardDemo and GenApp outputs respectively.
+transformed/**
+!transformed/**/
+!transformed/**/*.cbl
+!transformed/**/*.json
+!transformed/**/*.txt
+
+# Instrumented variants and their binaries (regenerable from a testN.json plus
+# the transformed source, exactly as transformed/ is regenerable from src)
+instrumented/**
+!instrumented/**/
+!instrumented/**/*.cbl
+!instrumented/**/*.json
+
+# Generated test-generation prompts (rebuilt from the program + variable table)
+testsuites/**/prompt.txt

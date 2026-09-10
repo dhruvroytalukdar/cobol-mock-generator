@@ -139,7 +139,7 @@ def run(path: str, options: Optional[PipelineOptions] = None) -> PipelineResult:
         client = HttpAstClient(AstClientConfig(base_url=opts.ast_url))
         try:
             document = client.get_ast(expanded, os.path.basename(path))
-            detection = anchor_nodes(expanded, document, NodeClassifier())
+            detection = anchor_nodes(expanded, document, NodeClassifier(), lexer)
             backend = "ast"
         except AstUnavailableError as exc:
             ast_error = str(exc)
@@ -290,6 +290,9 @@ def run(path: str, options: Optional[PipelineOptions] = None) -> PipelineResult:
                 commented_line_end=injected.shift(entry.commented_lines[1]),
                 inserted_line_start=injected.shift(entry.inserted_lines[0]),
                 inserted_line_end=injected.shift(entry.inserted_lines[1]),
+                already_commented_lines=[
+                    injected.shift(ln) for ln in entry.already_commented_lines
+                ],
                 generated_text=entry.generated,
                 diagnostic_codes=[d.code for d in entry.diagnostics],
             )

@@ -9,6 +9,7 @@ ignores it.
 from __future__ import annotations
 
 import os
+import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 
@@ -29,12 +30,22 @@ class InlineResult:
     copybooks_used: Dict[str, int] = field(default_factory=dict)  # name -> occurrences
 
 
+_SEQUENCE_NUMBER = re.compile(r"^\d{1,6}$")
+
+
 def normalize_fixed_format(text: str) -> str:
     """Shift copybook text into columns 8-72 when it starts in the sequence area.
 
     Copybooks in this corpus are already fixed-format, but a copybook written
     flush-left (or a generated one) would land in columns 1-7 and be silently
     dropped by the compiler.  Comment lines keep their indicator in column 7.
+
+    A numeric sequence number legitimately occupying columns 1-6 (e.g. AWS
+    CardDemo's copybooks, which carry "000100", "000200", ... on every line)
+    must not be mistaken for flush-left content: shifting a line so its own
+    sequence number lands in Area A turns that number into bogus program text
+    and breaks the compile.  Only non-numeric content there indicates a real
+    flush-left line.
     """
     out: List[str] = []
     for line in text.split("\n"):
@@ -44,9 +55,8 @@ def normalize_fixed_format(text: str) -> str:
         if is_comment_line(line):
             out.append(line)
             continue
-        # Any non-blank content in the sequence area (columns 1-6) means the
-        # line is not laid out for fixed format; indent it into Area A.
-        if line[:AREA_A_START - 1].strip():
+        seq_area = line[:AREA_A_START - 1].strip()
+        if seq_area and not _SEQUENCE_NUMBER.match(seq_area):
             stripped = line.lstrip()
             out.append(" " * AREA_A_START + stripped)
         else:

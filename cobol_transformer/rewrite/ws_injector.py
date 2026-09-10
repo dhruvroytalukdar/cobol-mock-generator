@@ -31,7 +31,6 @@ _WS_SECTION = re.compile(r"^\s*WORKING-STORAGE\s+SECTION\s*\.", re.IGNORECASE)
 _LINKAGE_SECTION = re.compile(r"^\s*LINKAGE\s+SECTION\s*\.", re.IGNORECASE)
 _LOCAL_SECTION = re.compile(r"^\s*LOCAL-STORAGE\s+SECTION\s*\.", re.IGNORECASE)
 _PROC_DIVISION = re.compile(r"^\s*PROCEDURE\s+DIVISION\b", re.IGNORECASE)
-_PROC_USING = re.compile(r"(PROCEDURE\s+DIVISION)\s+USING\b[^.]*", re.IGNORECASE)
 
 BANNER = "      * >>> TOOL-GENERATED MOCK SUPPORT FIELDS <<<"
 LINKAGE_NOTE = (
@@ -71,8 +70,6 @@ def _find_section_lines(text: str) -> Tuple[Optional[int], Optional[int], Option
         if lx.kind_at(start + 7) not in (Kind.CODE, Kind.IGNORED):
             continue
         raw = index.line_text(line)
-        if raw[:6].strip() and not raw[6:7].strip():
-            pass
         code = raw[7:72] if len(raw) > 7 else ""
         if not code.strip() or raw[6:7] in ("*", "/"):
             continue
@@ -123,9 +120,20 @@ def inject(
             promoted = True
 
     # A PROCEDURE DIVISION USING clause would demand arguments the standalone
-    # program never receives; none exists in this corpus, but strip it if seen.
-    if pd_line is not None and _PROC_USING.search(lines[pd_line]):
-        lines[pd_line] = _PROC_USING.sub(r"\1", lines[pd_line])
+    # program never receives.  The clause can span more than one physical line
+    # (a long or one-parameter-per-line list); the whole statement -- however
+    # many lines it occupies, through its terminating period -- is collapsed
+    # to a bare "PROCEDURE DIVISION." rather than stripping only the first
+    # line and leaving a dangling continuation of parameter names behind.
+    using_delta = 0
+    if pd_line is not None and re.search(r"\bUSING\b", lines[pd_line], re.IGNORECASE):
+        span_end = pd_line
+        while span_end < len(lines) - 1 and "." not in lines[span_end]:
+            span_end += 1
+        leading_ws = lines[pd_line][: len(lines[pd_line]) - len(lines[pd_line].lstrip(" "))]
+        span_len = span_end - pd_line + 1
+        lines[pd_line : span_end + 1] = [leading_ws + "PROCEDURE DIVISION."]
+        using_delta = 1 - span_len
         diagnostics.append(
             Diagnostic(
                 code="W-PROC-USING-REMOVED",
@@ -134,6 +142,11 @@ def inject(
                 line=pd_line + 1,
             )
         )
+
+    if using_delta:
+        # A negative "insertion" -- shift() sums deltas the same way whether
+        # a position's line count grew or shrank.
+        insertions.append((pd_line, using_delta))
 
     added: List[str] = []
     extra_items = extra_items or []

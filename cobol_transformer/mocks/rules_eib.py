@@ -108,7 +108,13 @@ EIB_FIELDS = [
     ("EIBRLDBK", "X(1)", "SPACE"),
 ]
 
-_IDENT = re.compile(r"\b(EIB[A-Z0-9]+)\b", re.IGNORECASE)
+#: ``(?<![...])``/``(?![...])`` instead of ``\b``: ``\b`` treats ``-`` as a
+#: non-word character like whitespace, so plain ``\bEIB...\b`` would also
+#: match the ``EIBCALEN`` inside an unrelated hyphenated name such as
+#: ``WS-EIBCALEN-BACKUP``, wrongly concluding the real CICS pseudo-register
+#: is referenced and synthesizing an unused declaration for it.
+_IDENT = re.compile(r"(?<![A-Za-z0-9_-])(EIB[A-Z0-9]+)(?![A-Za-z0-9_-])",
+                    re.IGNORECASE)
 
 
 def referenced_eib_fields(text: str, symbols: SymbolTable) -> List[str]:

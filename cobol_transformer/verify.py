@@ -58,8 +58,15 @@ def verify(
         if c.inserted_line_start and c.inserted_line_end >= c.inserted_line_start:
             for ln in range(c.inserted_line_start - 1, c.inserted_line_end):
                 drop.add(ln)
+        already_comment = {ln - 1 for ln in c.already_commented_lines}
         if c.commented_line_start and c.commented_line_end >= c.commented_line_start:
             for ln in range(c.commented_line_start - 1, c.commented_line_end):
+                # A line that was already a comment before this tool touched it
+                # (e.g. one option of a multi-line EXEC CICS command the
+                # original author had disabled) must stay commented on
+                # reconstruction -- only genuinely toggled lines get restored.
+                if ln in already_comment:
+                    continue
                 uncomment.add(ln)
 
     # Synthesised declarations: the banner plus the 01 entries following it.

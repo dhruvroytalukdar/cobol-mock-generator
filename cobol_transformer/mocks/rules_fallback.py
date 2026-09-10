@@ -16,8 +16,13 @@ from .codegen import cobol_string_literal
 from .rule_engine import MockResult, MockRule, RuleContext
 from .rules_cics import TRACE_PREFIX
 
-_RESP_OPTION = re.compile(r"\b(RESP2?|SQLCODE)\s*\(\s*([A-Za-z0-9$#@_-]+)\s*\)",
-                          re.IGNORECASE)
+#: ``(?<![...])`` instead of ``\b`` on the left: ``\b`` treats ``-`` as a
+#: non-word character like whitespace, so plain ``\bRESP\b`` would also match
+#: the tail of an unrelated hyphenated name like ``WS-ITEM-RESP(WS-IDX)``.
+_RESP_OPTION = re.compile(
+    r"(?<![A-Za-z0-9$#@_-])(RESP2?|SQLCODE)\s*\(\s*([A-Za-z0-9$#@_-]+)\s*\)",
+    re.IGNORECASE,
+)
 
 
 class GenericFallbackRule(MockRule):

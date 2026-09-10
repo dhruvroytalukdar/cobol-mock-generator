@@ -26,6 +26,7 @@ class ConstructRecord:
     commented_line_end: int = 0
     inserted_line_start: int = 0
     inserted_line_end: int = 0
+    already_commented_lines: List[int] = field(default_factory=list)
     generated_text: List[str] = field(default_factory=list)
     diagnostic_codes: List[str] = field(default_factory=list)
 
