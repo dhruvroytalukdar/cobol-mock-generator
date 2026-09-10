@@ -12,6 +12,9 @@ transformation and diffs the reconstruction against the input byte for byte.
 > **Detailed implementation documentation is in [`../docs/`](../docs/README.md)**
 > — nine documents covering each component, plus an end-to-end walkthrough of a
 > real program through all eight stages.
+>
+> **The test-generation pipeline built on top of `transformed/*.cbl` is
+> documented separately in [`docs/testgen.md`](docs/testgen.md).**
 
 ## Results on the GenApp corpus
 
@@ -153,6 +156,44 @@ end-of-data once its budget is spent.
 An unmocked construct is a visible compile error; a mis-anchored splice would
 silently corrupt working code. The first is always preferred.
 
+## Test-case generation, instrumentation & coverage (`testgen/`)
+
+A second, additive pipeline sits on top of `transformed/*.cbl`. Since a
+transformed program takes no CLI args or stdin and every mocked CICS/SQL call
+is deterministic, its entire behaviour is a pure function of its
+`WORKING-STORAGE` initial values — which makes it possible to generate test
+cases, run them for real coverage numbers, and re-run them as a regression
+suite with no further AI or oracle involvement.
+
+> **Full write-up, including why `expected_values` are never guessed and the
+> two GnuCOBOL gotchas that shaped the instrumenter, is in
+> [`docs/testgen.md`](docs/testgen.md).**
+
+```bash
+# 1. generate >= 15 test cases per program (headless `claude`, one per program)
+python -m cobol_transformer.testgen.generate_testcases transformed
+
+# 2. execute each case for real to freeze its expected_values (no AI)
+python -m cobol_transformer.testgen.oracle_runner testsuites/lgtestp1
+
+# 3. instrument + compile + run + score coverage (repeatable; no AI, no oracle)
+python -m cobol_transformer.testgen.run_and_report testsuites/lgtestp1
+```
+
+Run against the full `transformed/` corpus (10 programs, 196 generated cases):
+**196/196 passed**, block coverage 19–65% depending on the program (the
+`lgtestpN` terminal programs sit lowest because their mocked `RECEIVE MAP`
+overwrites the very field their `EVALUATE` switches on, making most `WHEN`
+branches unreachable from initial values — a property of the mocks, not of
+the test generator).
+
+| | |
+|---|---|
+| Test cases generated | 196 across 10 programs (≥ 15 each, enforced) |
+| Oracle-frozen (ground truth from a real run) | 196 / 196 |
+| Passed on re-run | 196 / 196 |
+| Block coverage (paragraph/section + IF/ELSE) | 19% – 65.2% per program |
+
 ## Layout
 
 ```
@@ -168,17 +209,24 @@ cobol_transformer/
   rewrite/   terminator commenter rewriter ws_injector syntax_repair
   output/    manifest writer
   gnucobol/  gnucobol_runner
+  testgen/   variable_context cfg literal_format instrumenter
+             prompt_builder generate_testcases oracle_runner run_and_report
 ```
 
 ## Tests
 
 ```bash
-python -m pytest tests/unit -q      # 198 passed, 5 skipped
+python -m pytest tests/unit -q      # 256 passed, 5 skipped
 ```
 
 The 5 skips are the parity test on the programs the language server declines to
-parse. Tests needing the AST server skip themselves when it is not running; the
-end-to-end tests use the lexical detector and need only the corpus.
+parse. Tests needing the AST server or GnuCOBOL skip themselves when either is
+not running; the end-to-end tests use the lexical detector and need only the
+corpus. `tests/unit/test_testgen.py` covers `testgen/` — literal formatting,
+fixed-format layout, control-flow extraction, instrumentation, and, where
+GnuCOBOL and the AST server are both reachable, real compile-and-run round
+trips including a proof that a branch probe cannot leak into its sibling
+branch.
 
 ## Requirements
 

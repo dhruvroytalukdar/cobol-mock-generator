@@ -22,13 +22,16 @@ __pycache__/
 # OS junk
 .DS_Store
 
-# Compiled GnuCOBOL binaries (regenerable from the committed .cbl via `cobc`)
-# transformed/{aws,genapp}/ hold the AWS CardDemo and GenApp outputs respectively.
-transformed/**
-!transformed/**/
-!transformed/**/*.cbl
-!transformed/**/*.json
-!transformed/**/*.txt
+# Transformation output (regenerable from the source corpus via the pipeline;
+# transformed/{aws,genapp}/ hold the AWS CardDemo and GenApp outputs). Not
+# transformation logic, so it lives outside cobol_transformer/ and is never
+# committed -- same treatment as judge_results/ below.
+/transformed/
+
+# Judge cases/results (generated per experiment run, not transformation
+# logic) -- kept outside cobol_transformer/judge/ so that directory holds
+# only code; see prepare_case.py's CASES_ROOT / run_judge.py's RESULTS_ROOT.
+/judge_results/
 
 # Instrumented variants and their binaries (regenerable from a testN.json plus
 # the transformed source, exactly as transformed/ is regenerable from src)

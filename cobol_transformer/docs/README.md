@@ -16,6 +16,7 @@ explain the pipeline to someone else in detail.
 | 7 | [Verification & Reporting](07-verification-and-reporting.md) | Stage 7 — the equivalence proof, manifest, report, and test suite |
 | 8 | [End-to-End Walkthrough](08-walkthrough.md) | One real program traced through all eight stages, with actual output |
 | 9 | [CLI & Operations](09-cli-and-operations.md) | Subcommands, flags, GnuCOBOL invocation, running the AST server |
+| 10 | [Test-Case Generation, Instrumentation & Coverage](testgen.md) | The additive `testgen/` pipeline on top of `transformed/*.cbl`: generation, the oracle, instrumentation, coverage scoring, and every gotcha found by actually running it |
 
 ## The one-paragraph version
 

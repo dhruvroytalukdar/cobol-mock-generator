@@ -15,8 +15,12 @@ from typing import List, Optional
 from .lexer import Kind, SourceLexer
 
 # COPY name [OF|IN library] [REPLACING ...] .
+# ``name`` is usually a bare identifier, but the COBOL standard (and GnuCOBOL)
+# also allows a quoted literal (``COPY 'name'.``) -- seen in corpora that pin
+# an exact case-sensitive member name. Both forms resolve identically since
+# the copybook resolver's lookup is already case-insensitive.
 _COPY = re.compile(
-    r"\bCOPY\s+(?P<name>[A-Za-z0-9$#@_-]+)"
+    r"\bCOPY\s+(?:(?P<name>[A-Za-z0-9$#@_-]+)|'(?P<qname1>[^']+)'|\"(?P<qname2>[^\"]+)\")"
     r"(?:\s+(?:OF|IN)\s+(?P<lib>[A-Za-z0-9$#@_-]+))?"
     r"(?P<rest>.*?)"
     r"\.",
@@ -97,11 +101,12 @@ def scan_copy_statements(text: str, lexer: Optional[SourceLexer] = None) -> List
         if re.search(r"\bREPLACING\b", rest, re.IGNORECASE):
             replacing = rest[re.search(r"\bREPLACING\b", rest, re.IGNORECASE).end() :]
 
+        raw_name = m.group("name") or m.group("qname1") or m.group("qname2")
         found.append(
             CopyStatement(
                 start=start,
                 end=m.end(),
-                name=m.group("name").upper(),
+                name=raw_name.upper(),
                 library=(m.group("lib") or None),
                 replacing=replacing.strip(),
                 form="COPY",
