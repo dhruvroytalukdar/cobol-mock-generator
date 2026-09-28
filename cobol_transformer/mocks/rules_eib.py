@@ -106,6 +106,12 @@ EIB_FIELDS = [
     ("EIBRESP", "S9(8) COMP", "0"),
     ("EIBRESP2", "S9(8) COMP", "0"),
     ("EIBRLDBK", "X(1)", "SPACE"),
+    # The whole EIB control block, passed by reference to utility subprograms
+    # (e.g. DSNTIAC) that take it as an opaque argument rather than reading
+    # individual fields. Layout doesn't matter for a local mock run -- it is
+    # never dereferenced field-by-field on that path -- so a raw byte area
+    # sized to the real CICS-supplied block is enough to make it addressable.
+    ("DFHEIBLK", "X(84)", None),
 ]
 
 #: ``(?<![...])``/``(?![...])`` instead of ``\b``: ``\b`` treats ``-`` as a
@@ -113,7 +119,7 @@ EIB_FIELDS = [
 #: match the ``EIBCALEN`` inside an unrelated hyphenated name such as
 #: ``WS-EIBCALEN-BACKUP``, wrongly concluding the real CICS pseudo-register
 #: is referenced and synthesizing an unused declaration for it.
-_IDENT = re.compile(r"(?<![A-Za-z0-9_-])(EIB[A-Z0-9]+)(?![A-Za-z0-9_-])",
+_IDENT = re.compile(r"(?<![A-Za-z0-9_-])(EIB[A-Z0-9]+|DFHEIBLK)(?![A-Za-z0-9_-])",
                     re.IGNORECASE)
 
 
